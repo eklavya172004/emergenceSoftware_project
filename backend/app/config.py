@@ -1,6 +1,8 @@
 """Configuration settings for the backend application."""
 from pydantic_settings import BaseSettings
+from pydantic import Field
 from typing import List
+import json
 
 
 class Settings(BaseSettings):
@@ -19,13 +21,13 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./portfolio.db"  # Default to SQLite
     DATABASE_URL: str = "sqlite:///./portfolio.db"  # Uppercase alias for compatibility
     
-    # CORS
-    cors_origins: List[str] = [
+    # CORS - Parse from JSON string if provided, otherwise use defaults
+    cors_origins: List[str] = Field(default_factory=lambda: [
         "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
-    ]
+    ])
     
     # Resume Context
     resume_context: str = """
