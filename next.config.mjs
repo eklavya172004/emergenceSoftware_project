@@ -14,15 +14,9 @@ const nextConfig = {
     optimizePackageImports: ["@heroicons/react"],
   },
 
-  // Development-only Webpack config
-  webpack: (config, { isServer, dev }) => {
-    if (dev) {
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-      };
-    }
-    return config;
+  // Turbopack configuration (Next.js 16+ default)
+  turbopack: {
+    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
 
   // Performance
