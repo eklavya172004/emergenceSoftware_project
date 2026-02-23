@@ -12,7 +12,7 @@ import json
 # ============================================
 
 YOUR_RESUME = """
-EKLAVYA NATH
+Name : EKLAVYA NATH
 Indore, Madhya Pradesh, India
 Email: en956@snu.edu.in
 Phone: +91-9522494683
@@ -130,7 +130,11 @@ Soft Skills:
 # API CONFIGURATION
 # ============================================
 
-API_URL = "http://localhost:8000/api/v1/chat/update-resume"
+# Production backend deployed on Render
+API_URL = "https://emergencesoftware-project.onrender.com/api/v1/chat/update-resume"
+
+# For local testing, use:
+# API_URL = "http://localhost:8000/api/v1/chat/update-resume"
 
 # ============================================
 # UPDATE RESUME
