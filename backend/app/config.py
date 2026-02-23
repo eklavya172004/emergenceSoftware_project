@@ -1,12 +1,27 @@
 """Configuration settings for the backend application."""
-from pydantic_settings import BaseSettings
-from pydantic import Field
-from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, ConfigDict
+from typing import List, Optional
 import json
+
+
+# Default CORS origins
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra='ignore',  # Ignore extra fields like CORS_ORIGINS
+    )
     
     # API Keys
     openrouter_api_key: str = ""
@@ -21,13 +36,38 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./portfolio.db"  # Default to SQLite
     DATABASE_URL: str = "sqlite:///./portfolio.db"  # Uppercase alias for compatibility
     
-    # CORS - Parse from JSON string if provided, otherwise use defaults
-    cors_origins: List[str] = Field(default_factory=lambda: [
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:8000",
-    ])
+    # CORS - Store as optional string to avoid JSON parsing issues
+    # Manually get from env, don't let pydantic-settings parse it
+    cors_origins_str: Optional[str] = Field(
+        default=None, 
+        exclude=True,  # Don't include in model serialization
+    )
+    
+    def __init__(self, **data):
+        """Custom init to handle CORS_ORIGINS from env."""
+        import os
+        # Get CORS_ORIGINS directly from environment if present
+        cors_env = os.getenv('CORS_ORIGINS') or os.getenv('cors_origins')
+        if cors_env:
+            data['cors_origins_str'] = cors_env
+        elif 'cors_origins_str' not in data:
+            data['cors_origins_str'] = None
+        super().__init__(**data)
+    
+    def get_cors_origins(self) -> List[str]:
+        """Get CORS origins, parsing from string if needed."""
+        if not self.cors_origins_str:
+            return DEFAULT_CORS_ORIGINS
+        try:
+            parsed = json.loads(self.cors_origins_str)
+            return parsed if isinstance(parsed, list) else DEFAULT_CORS_ORIGINS
+        except (json.JSONDecodeError, ValueError, TypeError):
+            return DEFAULT_CORS_ORIGINS
+    
+    @property
+    def cors_origins(self) -> List[str]:
+        """Property for backward compatibility."""
+        return self.get_cors_origins()
     
     # Resume Context
     resume_context: str = """
@@ -77,10 +117,5 @@ Relevant certifications and continuous learning in modern technologies
 INTERESTS
 Open source contributing, AI/ML applications, system design, cloud architecture
 """
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
-
 
 settings = Settings()
