@@ -6,18 +6,20 @@
       "dom.iterable",
       "esnext"
     ],
-    "jsx": "preserve",        // or "react-jsx" for React 17+
-    "allowJs": true,          // ✔️ allows JS/JSX files
-    "checkJs": true,          // ❓ only if you want type-checking in JS files
+    "jsx": "preserve",
+    "allowJs": true,
+    "checkJs": false,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noUncheckedIndexedAccess": true,
     "plugins": [
       {
         "name": "next"
